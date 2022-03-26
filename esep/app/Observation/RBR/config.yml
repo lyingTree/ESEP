@@ -1,0 +1,22 @@
+CTD:
+  variables:
+    Conductivity: 'c'
+    Depth: 'dep'
+    Temperature: 'temp'
+    Pressure: 'p'
+    Sea pressure: 'sp'
+    Salinity: 's'
+    Speed of sound: 'ss'
+    Specific conductivity: 'sc'
+    Density anomaly: 'den_ano'
+
+TD:
+  variables:
+    Depth: 'dep'
+    Temperature: 'temp'
+    Pressure: 'p'
+    Sea pressure: 'sp'
+
+Starndard:
+  Temperature: 'ITS-90'
+  Salinity: 'PSS-78'

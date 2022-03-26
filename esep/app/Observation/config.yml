@@ -1,0 +1,11 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+ValidBrands:
+  adcp:
+    - RDI
+  ctd:
+    - RBR
+    - SeaBird
+  td:
+    - RBR
+    - SeaBird

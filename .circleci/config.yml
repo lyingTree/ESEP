@@ -1,0 +1,392 @@
+version: 2.1
+
+orbs:
+  docker-publish: circleci/docker@1.7.0
+
+commands:
+  run_tests:
+    parameters:
+      mpl:
+        description: "Enable plot comparison tests"
+        type: boolean
+        default: true
+
+    steps:
+      - run:
+          name: Run tests
+          command: |
+            [[ "<<parameters.mpl>>" == "true" ]] && export MPL="--mpl"
+
+            source activate esep
+            pytest --circleci-parallelize --junitxml=test-results/junit.xml --cov=esep --ignore=tests/benchmarks --ignore=tests/wps --run-slow $MPL --durations=50 --benchmark-disable -v --log-cli-level=debug
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: test-results
+
+  install_conda_environment:
+    steps:
+      - run:
+          name: Checksum environment
+          command: |
+            echo "python=${PYTHON_VERSION}" > envconfig
+            cat envconfig
+
+      - restore_cache:
+          key: v18-deps1-{{ checksum "environment.yml" }}-{{ checksum "envconfig" }}
+
+      - run:
+          name: Install requirements
+          no_output_timeout: 30m
+          command: |
+            if [ ! -e /opt/conda/envs/esep ]; then
+              if [ -v PYTHON_VERSION ]; then
+                echo "Pinning python: ${PYTHON_VERSION}."
+                # pin python
+                conda create -c conda-forge -n esep -q -y "python=${PYTHON_VERSION}"
+
+                echo "python ${PYTHON_VERSION}.*" > /opt/conda/envs/esep/conda-meta/pinned
+                cat /opt/conda/envs/esep/conda-meta/pinned
+
+                conda env update -n esep -q -f environment.yml
+              else
+                conda env create -q --file environment.yml
+              fi
+
+              source activate esep
+
+              pip install pyyaml coveralls pytest-circleci-parallelized pytest-cov
+            fi
+
+      - save_cache:
+          key: v18-deps1-{{ checksum "environment.yml" }}-{{ checksum "envconfig" }}
+          paths:
+            - "/opt/conda/envs"
+      - run:
+          name: List environment
+          command: |
+            source activate esep
+            conda list
+
+  install_cartopy_shapes:
+    steps:
+      - restore_cache:
+          key: v1-cartopy-shapes
+
+      - run:
+          name: Download cartopy shapes
+          command: |
+            source activate esep
+            python -c "import cartopy; list(map(cartopy.io.shapereader.gshhs, ('c', 'l', 'i', 'h', 'f')))"
+            python -c "import cartopy; cartopy.io.shapereader.natural_earth(resolution='110m', category='cultural', name='admin_0_countries')"
+
+      - save_cache:
+          key: v1-cartopy-shapes
+          paths:
+            - "/root/.local/share/cartopy"
+
+
+test-template: &test-template
+  docker:
+    - image: continuumio/miniconda3
+  resource_class: medium+
+  steps:
+    - checkout
+
+    - install_conda_environment
+
+    - install_cartopy_shapes
+
+    - run_tests:
+        mpl: true
+
+jobs:
+  python_310:
+    <<: *test-template
+    parallelism: 5
+    environment:
+      - COVERALLS_UPLOAD=1
+      - PYTHON_VERSION=3.10
+
+  python_39:
+    <<: *test-template
+    parallelism: 5
+    environment:
+      - PYTHON_VERSION=3.9
+
+  python_38:
+    <<: *test-template
+    parallelism: 5
+    environment:
+      - PYTHON_VERSION=3.8
+
+  python_37:
+    <<: *test-template
+    parallelism: 5
+    environment:
+      - PYTHON_VERSION=3.7
+
+  docs-build-examples:
+    docker:
+      - image: continuumio/miniconda3
+    parallelism: 20
+    steps:
+      - checkout
+      - run:
+          name: Update packages
+          command: apt-get update
+      - run:
+          name: Install packages
+          command: apt-get install -y build-essential jq curl
+
+      - run:
+          name: Get PR title
+          command: |
+            if [[ -v CIRCLE_PULL_REQUEST ]]; then
+              PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed "s/.*\/pull\///")
+              GITHUB_PR_TITLE=$(curl "https://api.github.com/repos/ESEP/ESEP/pulls/${PR_NUMBER}" | jq -e '.title')
+              echo "export GITHUB_PR_NO=${PR_NUMBER}" >> ${BASH_ENV}
+              echo "export GITHUB_PR_TITLE=${GITHUB_PR_TITLE}" >> ${BASH_ENV}
+              echo "PR: ${GITHUB_PR_TITLE}"
+            fi
+
+      - install_conda_environment
+
+      - install_cartopy_shapes
+
+      - run:
+          name: Install sphinx and friends
+          command: |
+            source activate esep
+            conda install -c conda-forge sphinx sphinx-autoapi sphinx-gallery>=0.7.0
+            pip install sphinx-rtd-theme
+
+      - run:
+          name: Checksum gallery
+          command: cd docs && make checksum-gallery | tee /tmp/gallery-checksum.txt
+
+      - run:
+          name: Checksum plots
+          command: cd docs && make checksum-plots | tee /tmp/plots-checksum.txt
+
+      # saved in docs-build
+      - restore_cache:
+          key: gallery-v9-{{ checksum "/tmp/gallery-checksum.txt" }}
+
+      # saved in docs-build
+      - restore_cache:
+          key: plots-v4-{{ checksum "/tmp/plots-checksum.txt" }}
+
+      - run:
+          name: Check if examples should be re-built
+          command: |
+            if git log --oneline --pretty=format:%s "master^1..${CIRCLE_SHA1}" | grep '\[run-ex\]' ; then
+              BUILD_EXAMPLES=1
+            else
+              BUILD_EXAMPLES=0
+            fi
+            echo "export BUILD_EXAMPLES=${BUILD_EXAMPLES}" >> ${BASH_ENV}
+            echo "Build examples: ${BUILD_EXAMPLES}"
+
+      - run:
+          name: Clean cache if docs should be re-built
+          command: |
+            if [[ "${GITHUB_PR_TITLE}" == *"[run-ex]"* || "${BUILD_EXAMPLES}" -eq 1 ]]; then
+              echo "Clearing out examples.."
+              source activate esep
+              cd docs/
+              make clean
+            fi
+
+      - run:
+          name: Wake-up Thredds-servers
+          command: |
+              source activate esep
+              python .circleci/wake-up-thredds.py
+
+      - run:
+          name: Build docs
+          command: |
+            source activate esep
+            cd docs/
+            make sharded-gallery SHARDS=${CIRCLE_NODE_TOTAL} SHARD=${CIRCLE_NODE_INDEX}
+            ls -R source
+          no_output_timeout: 40m
+
+      - store_test_results:
+          path: docs/test-results
+
+      - store_artifacts:
+          path: docs/test-results
+
+      - persist_to_workspace:
+          root: docs/source
+          paths: gallery
+
+  docs-build:
+    docker:
+      - image: continuumio/miniconda3
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: docs/source
+
+      - run:
+          name: Update packages
+          command: apt-get update
+      - run:
+          name: Install packages
+          command: apt-get install -y build-essential gfortran libgeos-dev gdal-bin imagemagick jq curl
+
+      - run:
+          name: Get PR title
+          command: |
+            if [[ -v CIRCLE_PULL_REQUEST ]]; then
+              PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed "s/.*\/pull\///")
+              GITHUB_PR_TITLE=$(curl "https://api.github.com/repos/ESEP/ESEP/pulls/${PR_NUMBER}" | jq -e '.title')
+              echo "export GITHUB_PR_NO=${PR_NUMBER}" >> ${BASH_ENV}
+              echo "export GITHUB_PR_TITLE=${GITHUB_PR_TITLE}" >> ${BASH_ENV}
+              echo "PR: ${GITHUB_PR_TITLE}"
+            fi
+
+      - run:
+          name: Check if examples should be built
+          command: |
+            if git log --oneline --pretty=format:%s "master..${CIRCLE_SHA1}" | grep '\[run-ex\]' ; then
+              BUILD_EXAMPLES=1
+            else
+              BUILD_EXAMPLES=0
+            fi
+            echo "export BUILD_EXAMPLES=${BUILD_EXAMPLES}" >> ${BASH_ENV}
+            echo "Build examples: ${BUILD_EXAMPLES}"
+
+      - restore_cache:
+          key: v7-docs-deps1-{{ checksum "environment.yml" }}
+
+      - install_conda_environment
+
+      - install_cartopy_shapes
+
+      - run:
+          name: Install sphinx and friends
+          command: |
+            source activate esep
+            conda install -c conda-forge sphinx sphinx-autoapi sphinx-gallery>=0.7.0
+            pip install sphinx-rtd-theme
+
+      - save_cache:
+          key: v7-docs-deps1-{{ checksum "environment.yml" }}
+          paths:
+            - "/opt/conda/envs"
+
+      # the plot and gallery cache is not perfect, because it will only detect plot directive changes
+      # in the docs/source and not inline plot directives in the esep module. these
+      # should be re-generated anyway though, but won't be cached until the docs change.
+
+      - run:
+          name: Checksum gallery
+          command: cd docs && make checksum-gallery | tee /tmp/gallery-checksum.txt
+
+      - run:
+          name: Checksum plots
+          command: cd docs && make checksum-plots | tee /tmp/plots-checksum.txt
+
+      - run:
+          name: Build docs
+          command: |
+            source activate esep
+            cd docs/
+            ls -R source/gallery
+            make html
+          no_output_timeout: 40m
+
+      - save_cache:
+          key: gallery-v9-{{ checksum "/tmp/gallery-checksum.txt" }}
+          paths:
+            - "docs/source/gallery"
+
+      - save_cache:
+          key: plots-v4-{{ checksum "/tmp/plots-checksum.txt" }}
+          paths:
+            - "docs/build/plot_directive"
+
+      - persist_to_workspace:
+          root: docs/build
+          paths: html
+
+  docs-deploy:
+    docker:
+      - image: node:10
+    steps:
+      - checkout
+      - attach_workspace:
+          at: docs/build
+      - run:
+          name: Disable jekyll builds
+          command: touch docs/build/html/.nojekyll
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "ci-build@esep"
+            git config user.name "ci-build"
+
+      - add_ssh_keys:
+          fingerprints:
+            - "49:f4:a4:5c:2f:d4:6a:0f:26:21:a0:f2:d4:3c:71:ff"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist docs/build/html --repo git@github.com:ESEP/esep.github.io.git --branch master
+
+workflows:
+  version: 2.1
+
+  test:
+    jobs:
+      - python_310
+      - python_39
+      - python_38
+      - python_37
+      - python_310_o_l_d
+
+  docs:
+    jobs:
+      - docs-build-examples
+
+      - docs-build:
+          requires:
+            - docs-build-examples
+
+      - docs-deploy:
+          requires:
+            - docs-build
+          filters:
+            branches:
+             only: master
+
+  # This workflow will deploy images on merge to master only
+  build-and-publish-docker-image:
+    jobs:
+
+      - docker-publish/publish:
+          image: esep/esep
+          dockerfile: Dockerfile
+          tag: latest
+          filters:
+            branches:
+             only: master
+          after_build:
+            - run:
+                name: Publish Docker Containers with Python Version 3
+                command: |
+                   # Here we preview the Docker Tag
+                   pushd esep
+                   DOCKER_TAG=$(python -c 'import version; print(version.__version__)')
+                   popd
+
+                   echo "Version for Docker tag is ${DOCKER_TAG}"
+                   docker tag esep/esep:latest esep/esep:v${DOCKER_TAG}
+

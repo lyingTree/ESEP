@@ -1,0 +1,1014 @@
+# -*- coding:uft-8 -*-
+meta:
+  BA:
+    name: 'Evaluation Amplitude Minimum'
+    long_name: 'The minimum amplitude of an internal bottom-track filter that
+    determines bottom detection'
+    description: 'BA sets the minimum amplitude of an internal bottom-track
+    filter that determines bottom detection. Reducing BA increases the
+    bottom-track detection range, but also may increase the possibility of
+    false bottom detections.'
+
+  BB:
+    name: 'High Bandwidth Maximum Depth'
+    long_name: 'The depth at which the ADCP switches between 25% and 50%
+    bandwidth'
+    units: 'dm'
+    description: 'This command lets the user define the depth at which the ADCP
+    switches between 25% and 50% bandwidth. A setting of zero disables 50%
+    bandwidth. A setting of 9999 disables 25% bandwidth.'
+
+  BC:
+    name: 'Correlation Magnitude Minimum'
+    long_name: 'A minimum threshold for good bottom-track data'
+    description: 'Sets a minimum threshold for good bottom-track data. The ADCP
+    flags as bad any bottom-track data with a correlation magnitude less than
+    this value.'
+
+  BD:
+    name: 'Delay before Reacquire'
+    long_name: 'The number of ADCP ensembles to wait after losing the bottom
+    before trying to track it again'
+    description: 'If BD = 10, the ADCP waits 10 ADCP ensembles after the
+    automatic search sequence before beginning the search sequence again.
+    If BD = 0 (default), the ADCP continually tries to find the bottom.'
+
+  BE:
+    name: 'Error Velocity Maximum'
+    long_name: 'The maximum error velocity for good bottom-track data'
+    units: 'mm/s'
+    description: 'The ADCP uses this parameter to determine good bottom-track
+    velocity data. If the error velocity is greater than this value, the ADCP
+    marks as bad all four beam velocities (or all four coordinate velocities,
+    if transformed). If three beam solutions are allowed and only three beams
+    are good, then the data is accepted since four good beams are needed for
+    error velocity calculation.'
+
+  BF:
+    name: 'Depth Guess'
+    long_name: 'The minimum amplitude of an internal bottom-track filter that
+    determines bottom detection'
+    description: 'When set to a non-zero value, the ADCP transmits a fixed
+    pulse based on a given bottom range. This is useful for applications with
+    fixed range bottoms. The command reduces the amount of time the ADCP uses
+    to search for the bottom if lost.'
+
+  BI:
+    name: 'Gain Switch Depth'
+    long_name: 'The maximum vertical distance from the transducer to the bottom
+    at which the ADCP operates at low gain'
+    units: 'm'
+    description: 'When the vertical range to the bottom is less than BI, the
+    unit operates in low gain. When the vertical range is greater than BI,
+    internal logic determines which gain (low or high) is optimal. In high
+    backscatter areas, it may be necessary to raise this setting in order to
+    detect bottom throughout the range of the system.'
+
+  BJ:
+    name: 'Bottom Blank'
+    long_name: 'The blanking distance for Bottom Tracking'
+    units: 'cm'
+    description: 'BJ blanks out bad data close to the transducer head, thus
+    creating a window that reduces unwanted data in the ensemble. This allows
+    the ADCP transmit circuits time to recover before beginning the receive
+    cycle.'
+
+  BK:
+    name: 'Water-Mass Layer Mode'
+    long_name: 'The ping frequency of the water-mass layer ping'
+    description: 'BK selects how often the ADCP performs a water-mass layer
+    ping while bottom tracking. The number of water-mass layer pings per
+    ensemble is dependent on the BP-command (bottom pings per ensemble) and
+    this command setting. Use the BL-command to set the location of the
+    water-mass layer.'
+
+  BL:
+    name: 'Water-Mass Layer Parameters'
+    long_name: 'The bottom-track water-mass layer boundaries and minimum layer
+    size'
+    units: 'dm'
+    description: 'The BL-command sets a water-mass layer. You can use this
+    layer as a reference point when the bottom is out of range or is incorrect.
+    Water-mass layer output data are available when both BK - Water-Mass Layer
+    Mode and BP - Bottom-Track Pings Per Ensemble are nonzero values, and the
+    bottom must be at least the Minimum Layer Size + Near Layer Boundary + 20%
+    of the reported depth away from the transducer. The Far Layer Boundary
+    (ffff) must be less than the maximum profiling distance or the ADCP sends
+    Error Code 011.\n The user-defined water-mass layer is used unless the
+    minimum layer comes within 20% of the water boundary (sea floor for
+    down-looking systems; surface for up-looking systems). As the user-defined
+    water-mass layer comes within 20% of the boundary, the layer compresses in
+    size until the minimum water-mass layer size is reached. When the boundary
+    moves closer to the transducer, no water mass ping will be sent.'
+
+  BM:
+    name: 'Bottom Track Mode'
+    long_name: 'The Bottom Track mode'
+    description: 'Please see the file: RDI ADCP WorkHorse Commands and Output
+    Data Format.pdf'
+
+  BP:
+    name: 'Bottom-Track Pings per Ensemble'
+    long_name: 'The number of bottom-track pings to average together in each
+    data ensemble'
+    description: 'BP sets the number of bottom-track pings to average together
+    in each ensemble before sending/recording bottom-track data.'
+
+  BR:
+    name: 'Resolution'
+    long_name: 'The vertical depth resolution'
+    description: 'BR sets the vertical depth resolution as a percentage of the
+    overall range detected. The lower the resolution, the finer the depth
+    reading. With BR0 set, if you had a depth of 100 meters, then the depth
+    would read 100 meters until you passed 104 meters. If you had BR2 set, then
+    it would change when you reached 101 meters. Setting a higher resolution
+    results in longer ping times. BR0 = 4% BR1 = 2% BR2 = 1%'
+
+  BV:
+    name: 'Mode 7 Parameters'
+    long_name: 'Mode 7 Parameters'
+    description: "The first parameter sets the depth at which the bottom will
+    be searched. It avoids locking onto ringing (if any) or very high
+    backscatter water near the transducer. The second parameter controls the
+    correlation threshold for ambiguity resolving. A lower, fixed correlation
+    threshold is used to determine if a lag's velocity estimate is satisfactory.
+    \n The last parameter controls whether short lag velocity estimates are
+    output in the event the longer lag ambiguity cannot be resolved because one
+    or more of the short lag velocity estimates have too low a correlation. If
+    this parameter is a one, then the average of the four short lag estimates
+    that are above a lower, fixed correlation threshold will be used. If this
+    parameter is a zero, then no velocity will be output for this case."
+
+  BX:
+    name: 'Maximum Tracking Depth'
+    long_name: 'The maximum tracking depth in bottom-track mode'
+    units: 'dm'
+    description: 'The BX-command sets the maximum tracking depth used by the
+    ADCP during bottom tracking. This prevents the ADCP from searching too long
+    and too deep for the bottom, allowing a faster ping rate when the ADCP
+    loses track of the bottom. If the bottom-track water reference layer is in
+    use (BK > 0), BX must be greater than the Far Layer Boundary
+    (BLmmm,nnnn,ffff), or the ADCP sends Error Code 012.'
+
+  BZ:
+    name: 'Coherent Ambiguity Velocity'
+    long_name: 'The Bottom-Track Mode 5 ambiguity velocity'
+    units: 'cm/s'
+    description: 'The BZ-command selects the ambiguity velocity used by the
+    bottom-track ping in shallow water when bottom-track Mode 5 is in use.'
+
+  CF:
+    name: 'Flow Control'
+    long_name: 'Various WorkHorse ADCP data flow-control parameters'
+    description: 'Format: nnnnn. 1xxxx, Automatic Ensemble Cycling; 0xxxx,
+    Manual Ensemble Cycling. x1xxx, Automatic Ping Cycling; x0xxx, Manual Ping
+    Cycling. xx2xx, Hex-ASCII Data Output, Carriage Return-Linefeed delimited;
+    xx1xx, Binary Data Output; xx0xx, Hex-ASCII Data Output. xxx1x, Enable
+    Serial Output; xxx0x, Disable Serial Output. xxxx1, Enable Data Recorder;
+    xxxx0, Disable Data Recorder.'
+
+  CH:
+    name: 'Suppress Banner'
+    long_name: 'Prevents the unit from sending the wakeup message'
+    description: 'If CH1 is saved as part of the User Command Set, the unit
+    will not output a banner on wakeup. The unit will still output the ">"
+    prompt.'
+
+  CQ:
+    name: 'Transmit Power'
+    long_name: 'Power Level'
+    description: 'Set the transmit power high or low. This only affects 75 and
+    150 kHz systems. 0=Low, 255=High'
+
+  CX:
+    name: 'Low Latency Trigger Enable'
+    long_name: 'Enables or disables the low latency trigger input'
+    description: 'Turning on the Low Latency Trigger functionality allows the
+    ADCP to ping within ~300us of the rising edge of the trigger input. The
+    trigger input needs to be on a differential signal pair that starts with a
+    rising edge on one signal line and a falling edge on the other signal line.'
+
+  EA:
+    name: 'Heading Alignment'
+    long_name: 'The heading alignment angle'
+    units: '0.01 degrees'
+    description: 'EA is a heading alignment angle (referenced to Beam 3) used
+    as a new zero reference for heading output and for transformation to earth
+    coordinates.'
+
+  EB:
+    name: 'Heading Bias'
+    long_name: 'Magnetic variation'
+    units: '0.01 degrees'
+    description: 'EB is the heading angle that counteracts the electrical bias
+    or magnetic declination between the ADCP and the heading source.'
+
+  EC:
+    name: 'Speed of Sound'
+    long_name: 'The speed of sound value used for ADCP data processing'
+    units: 'm/s'
+    description: 'EC sets the sound speed value used by the ADCP to scale
+    velocity data, depth cell size, and range to the bottom. The ADCP assumes
+    the speed of sound reading is taken at the transducer head.'
+
+  ED:
+    name: 'Depth of Transducer'
+    long_name: 'The ADCP transducer depth.'
+    units: 'dm'
+    description: 'This measurement is taken from sea level to the transducer
+    faces. The ADCP uses ED in its speed of sound calculations. The ADCP
+    assumes the speed of sound reading is taken at the transducer head.'
+
+  EH:
+    name: 'Heading'
+    long_name: 'The ADCP heading angle'
+    units: '0.01 degrees'
+    description: 'When mounted on a stationary platform, the ADCP assumes beam
+    3 points north (0).'
+
+  EP:
+    name: 'Pitch'
+    long_name: 'The ADCP pitch (tilt 1) angle'
+    units: '0.01 degrees'
+    description: ''
+
+  ER:
+    name: 'Roll'
+    long_name: 'The ADCP roll (tilt 2) angle'
+    units: '0.01 degrees'
+    description: ''
+
+  ES:
+    name: 'Salinity'
+    long_name: "The water's salinity"
+    units: 'ppt'
+    description: ''
+
+  ET:
+    name: 'Temperature'
+    long_name: "The water's temperature"
+    units: '0.01 Degree_C'
+    description: 'The ADCP uses ET in its speed of sound calculations (see the
+    primer). The ADCP assumes the speed of sound reading is taken at the
+    transducer head.'
+
+  EX:
+    name: 'Coordinate Transformation'
+    long_name: 'The coordinate transformation processing flags'
+    description: 'EX sets firmware switches that control the coordinate
+    transformation processing for velocity and percent-good data. more details
+    see the file: RDI ADCP WorkHorse Commands and Output Data Format.pdf'
+
+  EZ:
+    name: 'Sensor Source'
+    long_name: 'The source of environmental sensor data'
+    description: 'Format: cdhprst. c=1, Calculates EC(speed of sound) from ED,
+    ES, and ET; d=1, uses ED from depth sensor; h=1, uses EH from transducer
+    heading sensor; p=1, uses EP from transducer pitch sensor; r=1, uses ER from
+    transducer roll sensor; s=1, uses ES(salinity) from conductivity sensor; t=1,
+    uses ET from transducer temperature sensor. If the field=0, or the sensor is
+    not available, the ADCP uses the manual command setting.'
+
+  TB:
+    name: 'Time Per Burst'
+    long_name: 'The interval between bursts of pings'
+    description: 'The TB and TC commands work together to allow the ADCP to
+    sample in a "burst mode." In some applications, it is desirable for the
+    ADCP to ping for a short period of time at a high ping rate ("burst"), wait
+    for a set period of time, and then repeat the process.'
+
+  TC:
+    name: 'Ensemble per Burst'
+    long_name: 'The number of ensembles per burst'
+    description: 'Setting TC to zero disables the burst mode. See the
+    TB-command for details on how these two commands interact.'
+
+  TE:
+    name: 'Time Per Ensemble'
+    long_name: 'The minimum interval between data collection cycles (data ensembles)'
+    description: 'During the ensemble interval set by TE, the ADCP transmits
+    the number of pings set by the WP-command. If TE = 00:00:00.00, the ADCP
+    starts collecting the next ensemble immediately after processing the
+    previous ensemble.'
+
+  TF:
+    name: 'Time of First Ping'
+    long_name: 'The time the ADCP wakes up to start data collection'
+    description: 'TF delays the start of data collection. This lets you deploy
+    the ADCP in the Standby mode and have it automatically start data
+    collection at a preset time (typically used in battery operated
+    instruments). When the command is given to the ADCP to start pinging, TF is
+    tested for validity. If valid, the ADCP sets its alarm clock to TF, goes to
+    sleep,and waits until time TF before beginning the data collection process.'
+
+  TP:
+    name: 'Time Between Pings'
+    long_name: 'The minimum time between pings'
+    description: 'The ADCP interleaves individual pings within a group so they
+    are evenly spread throughout the ensemble. During the ensemble interval set
+    by TE, the ADCP transmits the number of pings set by the WP-command. TP
+    determines the spacing between the pings. If TP = 0, the ADCP pings as
+    quickly as it can based on the time it takes to transmit each ping plus the
+    overhead that occurs for processing. Several commands determine the actual
+    ping time (WF, WN, WS, and actual water depth).'
+
+  WA:
+    name: 'False Target Threshold Maximum'
+    long_name: 'False target filter'
+    description: 'The ADCP uses the WA-command to screen water-track data for
+    false targets (usually fish). The first parameter in the WA command sets
+    the maximum difference between echo intensity readings among the four
+    profiling beams. If the WA threshold value is exceeded, the ADCP rejects
+    velocity data on a cellby-cell basis for either the affected beam (fish
+    detected in only one beam) or for the affected cell in all four beams (fish
+    detected in more than one beam). This usually occurs when fish pass through
+    one or more beams.\n The optional second parameter of the WA command sets
+    the starting bin number of the fish rejection screening. Setting the second
+    parameter to 0 is the same as setting it to 1 (i.e. all bins will be
+    screened for fish). Setting the second parameter to > WN and/or 255 will
+    effectively disable fish rejection screening. Setting the first parameter
+    without the optional second parameter will reset it to the default of 1.'
+
+  WB:
+    name: 'Mode 1 Bandwidth Control'
+    long_name: 'The profiling mode 1 bandwidth'
+    description: '0 = Wide (25%): High(Sample rate), Low(Data variance),
+    Low(Profiling range)\n 1 = Narrow (6.25%) Low(Sample rate),
+    High(Data variance), High(Profiling range)'
+
+  WC:
+    name: 'Low Correlation Threshold'
+    long_name: 'The minimum threshold of water-track data that must meet the
+    correlation criteria'
+    description: 'The ADCP uses WC to screen water-track data for the minimum
+    acceptable correlation requirements. The nominal (maximum) correlation
+    depends on system frequency and depth cell size (WS). WC sets the threshold
+    of the correlation below, which the ADCP flags the data as bad and does not
+    average the data into the ensemble.'
+
+  WE:
+    name: 'Error Velocity Threshold'
+    long_name: 'The maximum error velocity for good water-current data'
+    units: 'mm/s'
+    description: "The WE-command sets a threshold value used to flag
+    water-current data as good or bad. If the ADCP's error velocity value
+    exceeds this threshold, it flags data as bad for a given depth cell. WE
+    screens for error velocities in both beam and transformed-coordinate data.
+    Setting the WE command to zero (WE0) disables error velocity screening."
+
+  WF:
+    name: 'Blank after Transmit'
+    long_name: 'Blank after Transmit'
+    units: 'cm'
+    description: 'WF positions the start of the first depth cell at some
+    vertical distance from the transducer head. This allows the ADCP transmit
+    circuits time to recover before beginning the receive cycle. In effect, WF
+    blanks out bad data close to the transducer head, thus creating a depth
+    window that reduces unwanted data in the ensemble.'
+
+  WL:
+    name: 'Water Reference Layer'
+    long_name: 'Depth cell range for water-track reference layer averaging'
+    description: 'You can use the WL-command to lower the effects of transducer
+    motion on present measurements for multiple-ping ensembles (WP > 1). The
+    ADCP does this by averaging the velocities of a column of water and
+    subtracting that average from each of the depth cell velocities. The ADCP
+    accumulates the resulting average velocity and depth cell velocities. At
+    the end on an ensemble, the ADCP adds the average reference velocity back
+    to the normalized depth cell velocities. This results in quieter data for
+    depth cells in which there were few good samples.'
+
+  WN:
+    name: 'Number of Depth Cells'
+    long_name: 'The number of depth cells over which the ADCP collects data'
+    description: 'The range of the ADCP is set by the number of depth cells(WN)
+    times the size of each depth cell(WS).'
+
+  WP:
+    name: 'Pings Per Ensemble'
+    long_name: 'The number of pings to average in each data ensemble'
+    description: 'WP sets the number of pings to average in each ensemble
+    before sending/recording the data.'
+
+  WQ:
+    name: 'Sample Ambient Sound'
+    long_name: 'Samples ambient sound'
+    description: 'When WQ is set to 1, the ADCP samples RSSI before the water
+    ping. WQ uses an 8-meter blank and 8-meter depth cell before sending
+    water-profiling pings.'
+
+  WS:
+    name: 'Depth Cell Size'
+    long_name: 'The volume of water for one measurement cell'
+    units: 'cm'
+    description: 'The ADCP collects data over a variable number of depth cells.
+    WS sets the size of each cell in vertical centimeters.'
+
+  WT:
+    name: 'Transmit Length'
+    long_name: 'Transmit length different from the depth cell length (cell
+    sampling interval)'
+    units: 'cm'
+    description: 'When WT is set to zero, the transmit signal is set to the
+    depth cell size (WS-command). This is the default setting. Setting WT
+    allows selection of a transmit length different then the area depth cell
+    size (sampling length).'
+
+  WU:
+    name: 'Ping Weight'
+    long_name: 'The weight of each ping in an ensemble'
+    description: 'The WU command allows the user to choose the ensemble
+    weighting method. WU0 selects Box weighting which is a simple average of
+    the velocities in each ensemble. WU1 selects Triangle weighting, where the
+    first and last velocities are weighted the least, and the middle velocity
+    is weighted the most.'
+
+  WV:
+    name: 'Ambiguity Velocity'
+    long_name: 'The radial ambiguity velocity'
+    units: 'cm/s'
+    description: 'Set WV as low as possible to attain maximum performance, but
+    not too low or ambiguity errors will occur. Rule of thumb: Set WV to the
+    maximum relative horizontal velocity between water-current speed and ADCP
+    speed.\n  The WV command (ambiguity velocity setting) sets the maximum
+    velocity that can be measured along the beam when operating in water mode 1
+    (WM1). WV is used to improve the single-ping standard deviation. The lower
+    the value of the WV command, the lower the single-ping standard deviation.
+    You are required to set the WV command based on the maximum apparent
+    velocity (ADCP motion plus water speed). The following formula is used to
+    determine the setting of the WV command: WV = (Max. Apparent Vel. cm/s) *
+    sin(beam angle) * 1.2'
+
+  WK:
+    name: 'Depth Cell Size Override'
+    long_name: 'The depth cell size for Mode 11 and Mode 12 profiling'
+    description: 'The WK command allows a depth cell size that is smaller than
+    the minimum allowed by the WS command. If WK is set to other than zero it
+    overrides the depth cell size selected by the WS command. If WK is set to
+    zero the WS command takes precedence.'
+
+  WM:
+    name: 'Profiling Mode'
+    long_name: 'The application-dependent profiling mode used by the ADCP'
+    description: 'WM1=Dynamic Sea State; WM5=Very Low Standard Deviation, used
+    in low flow; WM8=Very Shallow Water, used in low flow; WM11=High Resolution
+    Mode; WM12=High Rate Ping; WM15=Lowered ADCP'
+
+  WO:
+    name: 'Mode 12 Parameters'
+    long_name: 'Mode 12 Parameters'
+    description: 'Format:[x,y],In Mode 12, a number of sub-pings are
+    transmitted very rapidly and their results are averaged internally to form
+    a single Mode 12 ping. The number of sub-pings is determined by the x
+    parameter. The y parameter sets the time between sub-pings in hundredths of
+    a second.'
+
+  WZ:
+    name: 'Mode 5 Ambiguity Velocity'
+    long_name: 'The minimum radial ambiguity for profiling Mode 5 (WM5), Mode 8
+    (WM8) and Mode 11 (WM11) Ambiguity Velocity'
+    units: 'cm/s'
+    description: 'Allows for very high resolution (small bins) with very low
+    standard deviation.\n The maximum value at which WM5 will work is related
+    to bottom track depth. The larger the WZ value, the shallower the water has
+    to be.'
+
+  HA:
+    name: 'Waves False Target Threshold'
+    long_name: 'The maximum difference between echo intensity readings among
+    the four profiling beams'
+    description: 'A false target (fish) filter. The ADCP uses the HA-command to
+    screen water-track data for false targets (usually fish). If the HA
+    threshold value is exceeded, the ADCP rejects velocity data on a
+    cell-by-cell basis for either the affected beam (fish detected in only one
+    beam) or for the affected cell in all four beams (fish detected in more
+    than one beam). This usually occurs when fish pass through one or more beams.'
+
+  HB:
+    name: 'Automatically Chosen Bins for Wave Processing'
+    long_name: 'The number of automatically chosen bins for doing Directional
+    Wave Spectra'
+    description: 'Bins are selected consecutively starting below the
+    "contaminated area." If more than three bins are selected, and there are
+    sufficient bins in the column, a mid column beam will be selected. If more
+    than four bins are selected, and there are sufficient bins in the column,
+    the first bin will be selected.'
+
+  HP:
+    name: 'Waves Pings per Wave Record'
+    long_name: 'The number of pings per wave record'
+    description: 'The number of pings collected per wave record (or burst).
+    With this value set to zero, Waves data collection is disabled.'
+
+  HR:
+    name: 'Time Between Wave Records'
+    long_name: 'The maximum interval between the start of each wave record'
+    description: 'The maximum interval between the start of consecutive wave
+    records. If the number of pings per record * the time between pings is
+    greater than the time between wave records, then the previous wave record
+    will complete before starting the next one.'
+
+  HS:
+    name: 'Bins for Directional Wave Spectrum'
+    long_name: 'The list of bins to use for directional wave spectrum data if
+    the WorkHorse ADCP is not selecting bins automatically'
+    description: 'The bins to be used for directional wave spectrum processing
+    if automatic bin selection is off. The list can contain a maximum of 20
+    bins. The limit of each element in the list is set by the number of current
+    profiling bins being collected. This list is completely separate from the
+    Velocity Spectrum bin list, to allow the selection of different bins for
+    Directional Wave and Velocity Spectrum processing.'
+
+  HT:
+    name: 'Time Between Wave Record Pings'
+    long_name: 'The maximum interval between each wave ping'
+    description: 'The maximum interval between consecutive wave pings. If the
+    number of pings per record * the time between pings is greater than the
+    time between wave records, then the previous wave record will complete
+    before starting the next one.'
+
+  HV:
+    name: 'Bins for Velocity Spectrum'
+    long_name: 'The list of bins to use for velocity spectrum data if the ADCP
+    is not selecting bins automatically'
+    description: 'The bins will be used for velocity spectrum processing if
+    automatic bin selection is off. The list can contain a maximum of 20 bins.
+    The limit of each element in the list is set by the number of current
+    profiling bins being collected. This list is complete separate from the
+    Directional Wave Spectrum bin list, to allow the selection of different
+    bins for Directional Wave and Velocity Spectrum processing.'
+
+  LA:
+    name: 'LADCP False Target Threshold Maximum'
+    long_name: 'The maximum difference between echo intensity readings among
+    the four profiling beams'
+    description: 'The ADCP uses the LA-command to screen water-track data for
+    false targets (usually fish). If the LA threshold value is exceeded, the
+    ADCP rejects velocity data on a cell-by-cell basis for either the affected
+    beam (fish detected in only one beam) or for the affected cell in all four
+    beams (fish detected in more than one beam). This usually occurs when fish
+    pass through one or more beams.'
+
+  LC:
+    name: 'LADCP Low Correlation Threshold'
+    long_name: 'The minimum threshold of water-track data that must meet the
+    correlation criteria'
+    description: 'The ADCP uses LC to screen water-track data for the minimum
+    acceptable correlation requirements. The nominal (maximum) correlation
+    depends on system frequency and depth cell size (WS). LC sets the threshold
+    of the correlation below, which the ADCP flags the data as bad and does not
+    average the data into the ensemble.'
+
+  LF:
+    name: 'LADCP Blank after Transmit'
+    long_name: 'The distance the start of the first depth cell away from the
+    transducer head'
+    units: 'cm'
+    description: 'LF positions the start of the first depth cell at some
+    vertical distance from the transducer head. This allows the ADCP transmit
+    circuits time to recover before beginning the receive cycle. In effect,
+    LF blanks out bad data close to the transducer head, thus creating a depth
+    window that reduces unwanted data in the ensemble.'
+
+  LJ:
+    name: 'Receiver Gain Select'
+    long_name: 'Forbid the ADCP to reduce receiver gain by 40 dB'
+    description: 'LJ0 tells the ADCP to reduce receiver gain by 40 dB. This may
+    increase data reliability in shallow-water applications where there is a
+    high content of backscatter material. LJ1 (the default) uses the normal
+    receiver gain.'
+
+  LN:
+    name: 'Number of Depth Cells'
+    long_name: 'The number of depth cells over which the ADCP collects data'
+    description: 'The range of the ADCP is set by the number of depth cells
+    (LN) times the size of each depth cell (LS).'
+
+  LP:
+    name: 'Pings Per Ensemble'
+    long_name: 'The number of pings to average in each data ensemble'
+    description: 'LP sets the number of pings to average in each ensemble
+    before sending/recording the data.'
+
+  LS:
+    name: 'Depth Cell Size'
+    long_name: 'The volume of water for one measurement cell'
+    units: 'cm'
+    description: 'The ADCP collects data over a variable number of depth cells.
+    LS sets the size of each cell in vertical centimeters. If you set LS to a
+    value less than its minimum value or greater than its maximum value, the
+    ADCP will accept the entry, but uses the appropriate minimum or maximum
+    value. For example, if you enter LS1 for a 300kHz system, the ADCP uses a
+    value of 20 cm for LS. Similarly, if you enter LS5000 for a 600kHz system,
+    the ADCP uses a value of 800 cm for the LS command.'
+
+  LV:
+    name: 'Ambiguity Velocity'
+    long_name: 'The radial ambiguity velocity'
+    units: 'cm/s'
+    description: 'Set LV as low as possible to attain maximum performance, but
+    not too low or ambiguity errors will occur. Rule of thumb: Set LV to the
+    maximum relative horizontal velocity between water-current speed and ADCP
+    speed.'
+
+  LW:
+    name: 'Bandwidth Control'
+    long_name: 'The profiling bandwidth (sampling rate)'
+    description: '0 = Wide (25%): High(Sample rate), Low(Data variance),
+    Low(Profiling range)\n 1 = Narrow (6.25%) Low(Sample rate),
+    High(Data variance), High(Profiling range)'
+
+  LZ:
+    name: 'LADCP Amplitude and Correlation Thresholds'
+    long_name: 'The minimum correlation magnitude and threshold for good
+    bottom-track data'
+    description: 'LZ sets the minimum amplitude of an internal bottom-track
+    filter that determines bottom detection. Reducing LZ increases the
+    bottom-track detection range, but also may increase the possibility of
+    false bottom detections.\n The LZ command also sets the minimum threshold
+    for good bottom-track data. The ADCP flags as bad any bottom-track data
+    with a correlation magnitude less than this value. A count value of 255 is
+    a perfect correlation (i.e. solid target).'
+
+  SA:
+    name: 'Synchronize Before/After Ping/Ensemble'
+    long_name: 'The rough timing of the synchronization pulse'
+    description: 'Use the SA command to set the rough timing of the
+    synchronization pulse. The first parameter determines whether the Master
+    (or Slave) will send (or wait for) a synchronization pulse before or after
+    the conditions set in parameters y and z. If the second parameter is set to
+    Ping, the third parameter determines what kind of ping to synchronize on.
+    If parameter y is set to Ensemble, the third parameter is ignored (but must
+    still be entered).'
+
+  SB:
+    name: 'Channel B Break Interrupt Mode'
+    long_name: 'Disables the hardware-break detection on the ping
+    synchronization input port, Channel B'
+    description: 'To avoid a ping synchronization input from being handled as a
+    hardware-break, disable hardware-break detection on the ping
+    synchronization input port, Channel B, by setting SB to 0.'
+
+  SI:
+    name: 'Synchronization Interval'
+    long_name: 'Hhow many pings/ensembles to wait before sending the next
+    synchronization pulse'
+    description: 'Use the SI command to set how many pings/ensembles (depending
+    on the SA command) to wait before sending the next synchronization pulse.'
+
+  SM:
+    name: 'RDS3 Mode Select'
+    long_name: 'The RDS3 Mode'
+    description: 'SM sets the RDS3 Mode. SM0 turns off the RDS3 mode and
+    disables all other commands on this menu. SM1 sets the RDS3 Master mode and
+    enables the SA, SI, SS, and SW commands. SM2 sets the RDS3 Slave mode and
+    enables the SA, SS, and ST commands. SM3 sets the NEMO Mode and enables the
+    SW command.'
+
+  SS:
+    name: 'RDS3 Sleep Mode'
+    long_name: 'The RDS3 Sleep Mode.'
+    description: 'When setting to No Sleep(0), the instrument remains awake
+    while waiting for the next ping time (or synchronization pulse) in a loop.
+    When setting to Sleep(1), the instrument sleeps between pings (or
+    synchronization pulses.) There are limitations to using the Sleep Mode.
+    A TRDI WorkHorse ADCP, setup as a slave, can only synchronize to within 2.5
+    ms of the Master. When the Slave is in No Sleep Mode, the slave can ping to
+    within 500 microseconds of the master. The benefits of power saving cost
+    are synchronization accuracy.'
+
+  ST:
+    name: 'Slave Timeout'
+    long_name: 'The amount of time a slave will wait to hear a synch pulse
+    before proceeding on its own'
+    units: 'seconds'
+    description: 'the amount of time a slave will wait to hear a synch pulse
+    before proceeding on its own. If a slave times out, it will automatically
+    ping according to the CF, TP, TE, WP, and BP command settings. This is a
+    fail-safe mechanism designed to allow the slave to proceed on its own
+    should communications with the master ADCP fail. Setting ST = 0 tells the
+    slave to wait indefinitely.'
+
+  SW:
+    name: 'Synchronization Delay'
+    long_name: 'The amount of time to wait after sending the pulse'
+    units: 'milliseconds'
+    description: 'When a Master attempts to ping a slave ADCP, it sends out a
+    pulse to the slave ADCP. The slave ADCP has a different code path than the
+    Master ADCP and thus, they will take different amounts of time to start the
+    ping. By adding in the default Master Delay of 7.5 ms, the code paths are
+    evened up to allow the units to start the pings at about the same time
+    (typically within 100 microseconds of each other).'
+
+  WG:
+    name: 'Gd Minimum'
+    long_name: 'Min PGood'
+    description: 'The minimum percentage of water-profiling pings in an ensemble
+    that must be considered good to output velocity data.'
+
+  BG:
+    name: 'BT Gd Minimum'
+    long_name: 'BT PERCENT GOOD MIN'
+    description: 'The minimum percentage of bottom-track pings in an ensemble
+    that must be good to output velocity data.'
+
+data:
+  AnFLatDeg:
+    name: 'flat'
+    long_name: 'The first latitude position received after the previous ADCP
+    ping'
+    units: 'Degrees'
+
+  AnFLonDeg:
+    name: 'flon'
+    long_name: 'The first longitude position received after the previous ADCP
+    ping'
+    units: 'Degrees'
+
+  AnLLatDeg:
+    name: 'llat'
+    long_name: 'The last latitude position received prior to the current ADCP
+    ping'
+    units: 'Degrees'
+
+  AnLLonDeg:
+    name: 'llon'
+    long_name: 'The last longitude position received prior to the current ADCP
+    ping'
+    units: 'Degrees'
+
+  AnBatt:
+    name: 'bat'
+    long_name: 'ADCP Battery voltage'
+    units: 'V'
+    scale: 100
+
+  AnBIT:
+    name: 'bit'
+    long_name: 'Built-In Tests'
+
+  AnDepthmm:
+    name: 'dep'
+    long_name: 'The Depth of ADCP transducer, excluding ADCP depth'
+    units: 'm'
+    scale: 1000
+
+  AnT100thDeg:
+    name: 'temp'
+    long_name: "Water's Temperature"
+    units: 'Degree_C'
+    scale: 100
+
+  AnOrienUP:
+    name: 'orient'
+    long_name: 'The Orientation of the ADCP'
+
+  AnH100thDeg:
+    name: 'head'
+    long_name: 'The ADCP heading angle of beam 3'
+    units: 'Degrees'
+    scale: 100
+
+  AnP100thDeg:
+    name: 'pitch'
+    long_name: 'The ADCP pitch (tilt 1) angle.'
+    units: 'Degrees'
+    scale: 100
+
+  AnR100thDeg:
+    name: 'roll'
+    long_name: 'The ADCP roll (tilt 2) angle'
+    units: 'Degrees'
+    scale: 100
+
+  AnBTDepthcmB1:
+    name: 'bt_dep1'
+    long_name: 'Depth of Beam 1 in Bottom Track mode, excluding ADCP depth'
+    units: 'm'
+    scale: 100
+
+  AnBTDepthcmB2:
+    name: 'bt_dep2'
+    long_name: 'Depth of Beam 2 in Bottom Track mode, excluding ADCP depth'
+    units: 'm'
+    scale: 100
+
+  AnBTDepthcmB3:
+    name: 'bt_dep3'
+    long_name: 'Depth of Beam 3 in Bottom Track mode, excluding ADCP depth'
+    units: 'm'
+    scale: 100
+
+  AnBTDepthcmB4:
+    name: 'bt_dep4'
+    long_name: 'Depth of Beam 4 in Bottom Track mode, excluding ADCP depth'
+    units: 'm'
+    scale: 100
+
+  AnBTEmmpersec:
+    name: 'bt_u'
+    long_name: 'The Bottom-Track E-W component velocity'
+    units: 'm/s'
+    scale: 1000
+
+  AnBTNmmpersec:
+    name: 'bt_v'
+    long_name: 'The Bottom-Track N-S component velocity'
+    units: 'm/s'
+    scale: 1000
+
+  AnBTVmmpersec:
+    name: 'bt_w'
+    long_name: 'The Bottom-Track Vertical component velocity'
+    units: 'm/s'
+    scale: 1000
+
+  AnBTErmmpersec:
+    name: 'bt_err'
+    long_name: 'The Bottom-Track Error velocity'
+    units: 'm/s'
+    scale: 1000
+
+  AnBTMagmmpersec:
+    name: 'bt_mag'
+    long_name: 'The Magnitude of Bottom-Track velocity'
+    units: 'm/s'
+    scale: 1000
+
+  AnBTDir10thDeg:
+    name: 'bt_dir'
+    long_name: 'The Direction of Bottom-Track velocity'
+    units: 'Degrees'
+    scale: 10
+
+  AnWMEmmpersec:
+    name: 'wm_u'
+    long_name: 'The E-W component velocity in Water Mass Reference Layer'
+    units: 'm/s'
+    scale: 1000
+
+  AnWMNmmpersec:
+    name: 'wm_v'
+    long_name: 'The N-S component velocity in Water Mass Reference Layer'
+    units: 'm/s'
+    scale: 1000
+
+  AnWMVmmpersec:
+    name: 'wm_w'
+    long_name: 'The Vertical component velocity in Water Mass Reference Layer'
+    units: 'm/s'
+    scale: 1000
+
+  AnWMErmmpersec:
+    name: 'wm_err'
+    long_name: 'The Error velocity in Water Mass Reference Layer'
+    units: 'm/s'
+    scale: 1000
+
+  AnWMMagmmpersec:
+    name: 'wm_mag'
+    long_name: 'The Magnitude of velocity in Water Mass Reference Layer'
+    units: 'm/s'
+    scale: 1000
+
+  AnWMDir10thDeg:
+    name: 'wm_dir'
+    long_name: 'The Direction of velocity in Water Mass Reference Layer'
+    units: 'Degrees'
+    scale: 10
+
+  AnNVEmmpersec:
+    name: 'nv_u'
+    long_name: 'The E-W component Navigation device velocity'
+    units: 'm/s'
+    scale: 1000
+
+  AnNVNmmpersec:
+    name: 'nv_v'
+    long_name: 'The N-S component Navigation device velocity'
+    units: 'm/s'
+    scale: 1000
+
+  AnNVMagmmpersec:
+    name: 'nv_mag'
+    long_name: 'The Magnitude of Navigation device velocity'
+    units: 'm/s'
+    scale: 1000
+
+  AnNVDir10thDeg:
+    name: 'nv_dir'
+    long_name: 'The Direction of Navigation device velocity'
+    units: 'Degrees'
+    scale: 10
+
+  AnWRLatDeg:
+    name: 'wr_lat'
+    long_name: 'The latitude of WinRiver'
+    units: 'Degrees'
+
+  AnWRLonDeg:
+    name: 'wr_lon'
+    long_name: 'The longitude of WinRiver'
+    units: 'Degrees'
+
+  SerBins:
+    name: 'bins'
+    long_name: 'The sequential number of the bin to which the data in the
+    output buffer apply'
+
+  SerEnsembles:
+    name: 'ens'
+    long_name: 'The sequential number of the ensemble to which the data in the
+    output buffer apply'
+
+  SerEmmpersec:
+    name: 'u'
+    long_name: 'The E-W component velocity'
+    units: 'm/s'
+    scale: 1000
+
+  SerNmmpersec:
+    name: 'v'
+    long_name: 'The N-S component velocity'
+    units: 'm/s'
+    scale: 1000
+
+  SerVmmpersec:
+    name: 'w'
+    long_name: 'The Vertical component velocity'
+    units: 'm/s'
+    scale: 1000
+
+  SerErmmpersec:
+    name: 'err'
+    long_name: 'The Error velocity'
+    units: 'm/s'
+    scale: 1000
+
+  SerMagmmpersec:
+    name: 'mag'
+    long_name: 'The Magnitudes of velocity'
+    units: 'm/s'
+    scale: 1000
+
+  SerDir10thDeg:
+    name: 'dir'
+    long_name: 'The Directions of velocity'
+    units: 'Degrees'
+    scale: 10
+
+  SerC1cnt:
+    name: 'cor_bm1'
+    long_name: 'The Correlation of Beam 1'
+
+  SerC2cnt:
+    name: 'cor_bm2'
+    long_name: 'The Correlation of Beam 2'
+
+  SerC3cnt:
+    name: 'cor_bm3'
+    long_name: 'The Correlation of Beam 3'
+
+  SerC4cnt:
+    name: 'cor_bm4'
+    long_name: 'The Correlation of Beam 4'
+
+  SerCAcnt:
+    name: 'cor_ave'
+    long_name: 'The Average Correlation of all beams'
+
+  SerEA1cnt:
+    name: 'ea_bm1'
+    long_name: 'The Echo Amplitude of Beam 1'
+
+  SerEA2cnt:
+    name: 'ea_bm2'
+    long_name: 'The Echo Amplitude of Beam 2'
+
+  SerEA3cnt:
+    name: 'ea_bm3'
+    long_name: 'The Echo Amplitude of Beam 3'
+
+  SerEA4cnt:
+    name: 'ea_bm4'
+    long_name: 'The Echo Amplitude of Beam 4'
+
+  SerEAAcnt:
+    name: 'ea_ave'
+    long_name: 'The Average Echo Amplitude of all beams'
+
+  SerPG1:
+    name: 'pg_bm1'
+    long_name: 'The Percentage of Good data of Beam 1'
+
+  SerPG2:
+    name: 'pg_bm2'
+    long_name: 'The Percentage of Good data of Beam 2'
+
+  SerPG3:
+    name: 'pg_bm3'
+    long_name: 'The Percentage of Good data of Beam 3'
+
+  SerPG4:
+    name: 'pg_bm4'
+    long_name: 'The Percentage of Good data of Beam 4'
