@@ -30,6 +30,7 @@ utils for processing spatial data
 """
 import numpy as np
 from pyproj import Geod
+
 from ESEP.esep.physics.base import speed
 
 
@@ -212,22 +213,16 @@ class CoordinateTransform:
         return current_dir, current_speed
 
 
-def theta_angle(d1, d2):
-    k = (d2["lat"] - d1["lat"]) / (d2["lon"] - d1["lon"])
-    return np.rad2deg(np.arctan(k))
-
-
 def beam2earth(b1, b2, b3, b4, roll, pitch, head, ang_b, ang_m, is_convex=True):
-    # <editor-fold desc="Beam-to-Instrument Transformation">
+    # Beam to Instrument Transformation --------------------------------------------------------------------------------
     a = 1 / np.sin(np.deg2rad(ang_b))
     b = 1 / (4 * np.cos(np.deg2rad(ang_b)))
     c = int((-1) ** (is_convex + 1))
     x = a * c * (b1 - b2)
     y = a * c * (b4 - b3)
     z = b * (b1 + b2 + b3 + b4)
-    # </editor-fold>
 
-    # <editor-fold desc="Instrument-to-Geomagnetic Transformation">
+    # Instrument to Geomagnetic Transformation -------------------------------------------------------------------------
     cr = np.cos(np.deg2rad(roll))
     sr = np.sin(np.deg2rad(roll))
 
@@ -237,18 +232,15 @@ def beam2earth(b1, b2, b3, b4, roll, pitch, head, ang_b, ang_m, is_convex=True):
     ch = np.cos(np.deg2rad(head))
     sh = np.sin(np.deg2rad(head))
 
-    u = (ch * cr + sh * sp * sr) * x + (sh * cp) * y + (
-        ch * sr - sh * sp * cr) * z
-    v = (-sh * cr + ch * sp * sr) * x + (ch * cp) * y + (
-        -sh * sr - ch * sp * cr) * z
+    u = (ch * cr + sh * sp * sr) * x + (sh * cp) * y + (ch * sr - sh * sp * cr) * z
+    v = (-sh * cr + ch * sp * sr) * x + (ch * cp) * y + (-sh * sr - ch * sp * cr) * z
     w = (-cp * sr) * x + sp * y + (cp * cr) * z
-    # </editor-fold>
 
-    # <editor-fold desc="Geomagnetc-to-Earth Transformation">
+    # Geomagnetc to Earth Transformation -------------------------------------------------------------------------------
     u_e = u * np.cos(np.deg2rad(ang_m)) + v * np.sin(np.deg2rad(ang_m))
     v_e = v * np.cos(np.deg2rad(ang_m)) - u * np.sin(np.deg2rad(ang_m))
     w_e = w
-    # </editor-fold>
+
     return u_e, v_e, w_e
 
 
@@ -256,11 +248,9 @@ def beam2earth(b1, b2, b3, b4, roll, pitch, head, ang_b, ang_m, is_convex=True):
 # 如果仪器部署时，设置了EB指令即设置了磁偏角，那么heading就表示已经经过了磁偏角的矫正了。
 # 即不需要在程序处理时减去或加上磁偏角了
 def rey_proj(rey12, rey34, head):
-    theta = np.expand_dims(head, axis=1)
-    rey_east = rey34 * np.sin(np.deg2rad(theta)) + rey12 * np.cos(
-        np.deg2rad(theta))
-    rey_north = rey34 * np.cos(np.deg2rad(theta)) - rey12 * np.sin(
-        np.deg2rad(theta))
+    theta = np.deg2rad(np.expand_dims(head, axis=1))
+    rey_east = rey34 * np.sin(theta) + rey12 * np.cos(theta)
+    rey_north = rey34 * np.cos(theta) - rey12 * np.sin(theta)
     return rey_east, rey_north
 
 

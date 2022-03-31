@@ -68,7 +68,7 @@ class TimeUtil:
             return base_time
 
     @staticmethod
-    def get_time(base_time: datetime, interval_units: str, interval_ls: Union[list, np.ndarray]) -> list[datetime]:
+    def get_time(base_time: datetime, interval_units: str, interval_ls: Union[list, np.ndarray]) -> list:
         """基于某一个时刻(base_time)，根据一维的相对时间间隔列表(invls)、数组，转化为对应时间的datetime列表
         Created date: 2020-06-03 19:47:17
         Last modified date: 2020-06-04 18:30:15
@@ -103,8 +103,8 @@ class TimeUtil:
         return ret
 
     @staticmethod
-    def extract_common_time_idx(d1: Union[list[datetime], np.ndarray], d2: Union[list[datetime], np.ndarray],
-                                lim_start=None, lim_end=None) -> tuple:
+    def extract_common_time_idx(d1: Union[list, np.ndarray], d2: Union[list, np.ndarray], lim_start=None,
+                                lim_end=None) -> tuple:
         d1, d2 = np.array(d1), np.array(d2)
         start_time = d1[0] if d1[0] > d2[0] else d2[0]
         end_time = d1[-1] if d1[-1] < d2[-1] else d2[-1]

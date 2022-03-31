@@ -193,15 +193,39 @@ class HorizDistVerify(Verification):
 
         lon = self.fvcom.lonc[cell_idx].data
         lat = self.fvcom.latc[cell_idx].data
-        args = (lon, lat, [self.lon_rng[0], self.lon_rng[-1], self.lat_rng[0], self.lat_rng[-1]], self.interp_space)
-        tmp = SegmentOperate(var_data, 500, interpolate.station2grid, 1, False, *args).value
+        loc_range = [self.lon_rng[0], self.lon_rng[-1], self.lat_rng[0], self.lat_rng[-1]]
+        args = (lon, lat, loc_range, self.interp_space, 'linear')
+        tmp = SegmentOperate(var_data, 100, interpolate.station2grid, 1, False, *args).value
         lon_grid, lat_grid = tmp[0, :2]
         if self.fvcom_mask is None or np.shape(self.fvcom_mask) != np.shape(lon_grid):
-            self.fvcom_mask, self.domain = construct_mask(self.fvcom.lon, self.fvcom.lat, self.fvcom.tri, lon_grid,
-                                                          lat_grid)
+            self.fvcom_mask, self.domain_polygon = construct_mask(self.fvcom.lon, self.fvcom.lat, self.fvcom.tri,
+                                                                  lon_grid, lat_grid)
         interp_var_data = tmp[:, 2]
         interp_var_data[:, self.fvcom_mask] = np.nan
         return lon_grid, lat_grid, interp_var_data
+
+    def domain(self, level=None, with_edge=True, with_depth=False, add_features_func=None, *args, **kwargs):
+        self.fvcom.variables(['h'])
+        tri = np.transpose(self.fvcom.tri[:]).T
+        depth = nodes2elems(np.squeeze(self.fvcom.h[:]), tri)
+        cb_label = '水深[m]'
+        kwargs['edgecolor'] = 'yellow'
+        if not with_depth:
+            depth[:] = np.nan
+            cb_label = None
+            kwargs['edgecolor'] = 'black'
+        if not with_edge:
+            kwargs.pop('edgecolor')
+
+        save_path = kwargs['save_path'] if 'save_path' in kwargs else self.save_dir.joinpath('网格')
+        kwargs.pop('save_path') if 'save_path' in kwargs else None
+
+        draw_manager = HorizontalDistribution(self.fvcom.lon, self.fvcom.lat)
+        if add_features_func is not None:
+            HorizontalDistribution.add_features = add_features_func
+        if level is None:
+            level = depth
+        draw_manager.tripcolor(tri, depth, level, self.lon_rng, self.lat_rng, save_path, cb_label, *args, **kwargs)
 
     def cum_erosion(self, level=np.linspace(-1, 1, 51), add_features_func=None, *args, **kwargs):
         lon, lat, data = self._horizontal_distribution_extract_data('bot_dthck')
@@ -220,7 +244,8 @@ class HorizDistVerify(Verification):
         draw_manager = HorizontalDistribution(lon, lat)
         if add_features_func is not None:
             HorizontalDistribution.add_features = add_features_func
-        draw_manager.quiver(u, v, scale, self.lon_rng, self.lat_rng, self.save_dir.joinpath('流场水平分布图'), *args, **kwargs)
+        draw_manager.quiver(u, v, scale, self.lon_rng, self.lat_rng, self.save_dir.joinpath('流场水平分布图'), qk_u=1, *args,
+                            **kwargs)
 
     def speed(self, level=np.linspace(0, 1, 51), add_features_func=None, *args, **kwargs):
         lon, lat, u = self._horizontal_distribution_extract_data('u')
@@ -235,13 +260,13 @@ class HorizDistVerify(Verification):
                               *args, **kwargs)
 
     def ssc(self, ssc_name='ssc0', level=np.linspace(0, 3, 51), add_features_func=None, *args, **kwargs):
-        lon, lat, ssc = self._horizontal_distribution_extract_data(ssc_name)
+        lon, lat, data = self._horizontal_distribution_extract_data(ssc_name)
         draw_manager = HorizontalDistribution(lon, lat)
-        ssc = np.nanmean(ssc, axis=0)
+        data = np.nanmean(data, axis=0)
 
         if add_features_func is not None:
             HorizontalDistribution.add_features = add_features_func
-        draw_manager.contourf(ssc, level, self.lon_rng, self.lat_rng, self.save_dir.joinpath('含沙量水平分布图'), '含沙量[g/l]',
+        draw_manager.contourf(data, level, self.lon_rng, self.lat_rng, self.save_dir.joinpath('含沙量水平分布图'), '含沙量[g/l]',
                               *args, **kwargs)
 
 
@@ -271,14 +296,14 @@ class HorizDistAniVerify(HorizDistVerify):
         draw_manager.contourf(data, level, self.lon_rng, self.lat_rng, self.save_dir.joinpath('冲淤累积变化图'), '冲淤[m]',
                               *args, **kwargs)
 
-    def current(self, scale=40, add_features_func=None, *args, **kwargs):
+    def current(self, scale=40, qk_u=1, add_features_func=None, *args, **kwargs):
         lon, lat, u = self._horizontal_distribution_extract_data('u')
         _, _, v = self._horizontal_distribution_extract_data('v')
-        # FIXME: 还没写好
         draw_manager = HorizDistAnimation(lon, lat)
         if add_features_func is not None:
             HorizontalDistribution.add_features = add_features_func
-        draw_manager.quiver(u, v, scale, self.lon_rng, self.lat_rng, self.save_dir.joinpath('流场平面变化图'), *args, **kwargs)
+        draw_manager.quiver(u, v, scale, self.lon_rng, self.lat_rng, self.save_dir.joinpath('流场平面变化图'), qk_u, *args,
+                            **kwargs)
 
     def speed(self, level=np.linspace(0, 1, 51), add_features_func=None, *args, **kwargs):
         lon, lat, u = self._horizontal_distribution_extract_data('u')

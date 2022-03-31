@@ -102,17 +102,6 @@ def is_number(num_str: str) -> bool:
         return False
 
 
-def kwargs_add(kwargs, name, val):
-    if name not in kwargs:
-        kwargs[name] = val
-
-
-def kwargs_check(kwargs, name):
-    if name in kwargs:
-        return kwargs.pop(name)
-    return dict()
-
-
 def ls2slice(rng: tuple or list):
     """Convert the sequence to a slice or itself.
 

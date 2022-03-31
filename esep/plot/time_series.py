@@ -109,6 +109,8 @@ class TimeSeries:
     def sediment(self, obs_time, model_time, obs, model, save_path):
         obs_invl = np.round(np.size(obs_time) / self.min_num_data).astype(int)
         model_invl = np.round(np.size(model_time) / self.min_num_data).astype(int)
+        if not model_invl or not obs_invl:
+            return
         self.ax.scatter(obs_time[::obs_invl], obs[::obs_invl], s=20, color='black', label='观测')
         self.ax.plot(model_time[::model_invl], model[::model_invl], linewidth=2, color='black', label='模型')
         self._common('含沙量[kg/m3]', model_time[::model_invl + 1], np.arange(0, 3.51, 0.5), False)
@@ -117,6 +119,8 @@ class TimeSeries:
     def depth(self, obs_time, model_time, obs, model, save_path):
         obs_invl = np.round(np.size(obs_time) / self.min_num_data).astype(int)
         model_invl = np.round(np.size(model_time) / self.min_num_data).astype(int)
+        if not model_invl or not obs_invl:
+            return
         self.ax.scatter(obs_time[::obs_invl], (obs - np.nanmean(obs))[::obs_invl], s=35, color='black', label='观测')
         self.ax.plot(model_time[::model_invl], (model - np.nanmean(model))[::model_invl], linewidth=2, color='black',
                      label='模型')
@@ -126,6 +130,8 @@ class TimeSeries:
     def cs_dir(self, obs_time, model_time, obs, model, save_path):
         obs_invl = np.round(np.size(obs_time) / self.min_num_data).astype(int)
         model_invl = np.round(np.size(model_time) / self.min_num_data).astype(int)
+        if not model_invl or not obs_invl:
+            return
         self.fig.set_size_inches(12, 4)
         self.fig.clf()
         axs = self.fig.subplots(2, 1)
@@ -140,6 +146,7 @@ class TimeSeries:
 
         for idx, ax in enumerate(axs):
             self.ax = ax
+
             ax.scatter(obs_time[::obs_invl], obs[idx][::obs_invl], s=20, color='black', label='观测')
             ax.plot(model_time[::model_invl], model[idx][::model_invl], linewidth=2, color='black', label='模型')
             flag = False if idx else True
